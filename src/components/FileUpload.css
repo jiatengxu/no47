@@ -1,0 +1,44 @@
+/* Custom styles that Bootstrap doesn't provide */
+
+.upload-area {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-style: dashed !important;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.upload-area:hover {
+  border-color: #4299e1 !important;
+  background-color: #ebf8ff !important;
+}
+
+.upload-area.dragging {
+  border-color: #4299e1 !important;
+  background-color: #bee3f8 !important;
+  transform: scale(1.02);
+}
+
+.upload-area.has-file {
+  cursor: default;
+}
+
+.upload-area.has-file:hover {
+  transform: none;
+  background-color: #f8f9fa !important;
+}
+
+.upload-icon {
+  display: block;
+}
+
+.file-preview {
+  width: 100%;
+}
+
+.upload-prompt {
+  pointer-events: none;
+}
