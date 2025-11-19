@@ -3,7 +3,6 @@ import { useState } from 'react';
 import UploadPage from './pages/UploadPage';
 import VariablesPage from './pages/VariablesPage';
 import ResultPage from './pages/ResultPage';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
 function App() {

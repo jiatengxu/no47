@@ -1,21 +1,6 @@
-/* Custom styles that Bootstrap doesn't provide */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap");
+
 .app {
   min-height: 100vh;
-  background: #f8f9fa;
-}
-
-/* Custom gradient for headers - Bootstrap doesn't have gradient utilities */
-.gradient-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-
-/* Page background gradient */
-.gradient-bg {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  min-height: 100vh;
-}
-
-/* Keep custom shadow that's stronger than Bootstrap's */
-.custom-shadow {
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  font-family: "Inter", sans-serif;
 }
