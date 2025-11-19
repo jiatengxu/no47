@@ -1,19 +1,88 @@
-/* Custom gradient button style */
-.gradient-button {
+.upload-page {
+  background: linear-gradient(135deg, #667eea 0%, #eae1f3 100%);
+  min-height: 100vh;
+  padding: 1rem;
+}
+
+.upload-page-container {
+  max-width: 56rem;
+  margin: 0 auto;
+}
+
+.upload-card {
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.upload-card-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  text-align: center;
+  padding: 3rem 1rem;
+}
+
+.upload-card-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.upload-card-subtitle {
+  font-size: 1.25rem;
+  margin-bottom: 0;
+  opacity: 0.95;
+}
+
+.upload-card-body {
+  padding: 2.5rem;
+}
+
+.upload-actions {
+  padding: 0 2.5rem 2.5rem;
+  text-align: center;
+}
+
+.continue-button {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border: none;
   color: white;
+  padding: 0.75rem 2.5rem;
+  font-size: 1.125rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 
-.gradient-button:hover {
+.continue-button:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
 }
 
-.gradient-button:active {
+.continue-button:active {
   transform: translateY(0);
+}
+
+@media (max-width: 768px) {
+  .upload-card-header {
+    padding: 2rem 1rem;
+  }
+  
+  .upload-card-title {
+    font-size: 2rem;
+  }
+  
+  .upload-card-subtitle {
+    font-size: 1rem;
+  }
+  
+  .upload-card-body {
+    padding: 1.5rem;
+  }
+  
+  .upload-actions {
+    padding: 0 1.5rem 1.5rem;
+  }
 }

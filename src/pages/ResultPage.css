@@ -1,0 +1,59 @@
+.result-page {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  padding: 1rem;
+}
+
+.result-page-container {
+  max-width: 56rem;
+  margin: 0 auto;
+}
+
+.result-card {
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.result-card-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  text-align: center;
+  padding: 3rem 1rem;
+}
+
+.result-card-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.result-card-subtitle {
+  font-size: 1.25rem;
+  margin-bottom: 0;
+  opacity: 0.95;
+}
+
+.result-card-body {
+  padding: 2.5rem;
+  min-height: 200px;
+}
+
+@media (max-width: 768px) {
+  .result-card-header {
+    padding: 2rem 1rem;
+  }
+  
+  .result-card-title {
+    font-size: 2rem;
+  }
+  
+  .result-card-subtitle {
+    font-size: 1rem;
+  }
+  
+  .result-card-body {
+    padding: 1.5rem;
+  }
+}
