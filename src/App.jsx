@@ -3,6 +3,7 @@ import { useState } from 'react';
 import UploadPage from './pages/UploadPage';
 import VariablesPage from './pages/VariablesPage';
 import ResultPage from './pages/ResultPage';
+import ClaudeTestPanel from './components/ClaudeTestPanel';
 import './App.css';
 
 function App() {
@@ -12,6 +13,7 @@ function App() {
   return (
     <Router>
       <div className="app">
+        <ClaudeTestPanel />
         <Routes>
           <Route 
             path="/" 

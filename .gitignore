@@ -8,8 +8,14 @@ backend/*.pyd
 backend/.Python
 backend/pip-log.txt
 backend/pip-delete-this-directory.txt
+
+# Environment Variables - CRITICAL FOR SECURITY
 backend/.env
-backend/*.env
+backend/.env.local
+backend/.env.*.local
+.env
+.env.local
+.env.*.local
 
 # Temporary files
 backend/uploads/*
@@ -43,3 +49,16 @@ dist-ssr/
 # OS
 Thumbs.db
 .DS_Store
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# Sensitive files - NEVER COMMIT
+*.pem
+*.key
+*.secret
+*.credentials
