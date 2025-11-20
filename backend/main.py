@@ -1,7 +1,10 @@
 """
-FastAPI Backend for Document Processing
+FastAPI Backend for Document Processing with Claude API Integration
 """
 import os
+from dotenv import load_dotenv
+load_dotenv()
+
 import shutil
 from pathlib import Path
 from datetime import datetime
@@ -9,11 +12,12 @@ from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from services.docling_service import DoclingService
+from services.claude_service import ClaudeService
 
 # Initialize FastAPI
 app = FastAPI(
     title="Document Processing API",
-    description="Backend for extracting and processing documents with Docling",
+    description="Backend for extracting and processing documents with Docling and Claude AI",
     version="1.0.0"
 )
 
@@ -28,6 +32,11 @@ app.add_middleware(
 
 # Initialize services
 docling_service = DoclingService()
+try:
+    claude_service = ClaudeService()
+except ValueError as e:
+    print(f"Warning: Claude API service failed to initialize: {e}")
+    claude_service = None
 
 # Configure paths
 BASE_DIR = Path(__file__).resolve().parent
@@ -53,10 +62,99 @@ async def root():
     return {
         "status": "online",
         "message": "Document Processing API is running",
-        "version": "1.0.0"
+        "version": "1.0.0",
+        "claude_available": claude_service is not None
     }
 
 
+@app.post("/api/claude/test")
+async def test_claude():
+    """
+    Simple test endpoint to verify Claude API integration.
+    Sends a test prompt and returns response to confirm connectivity.
+    
+    Returns:
+        Test response from Claude API
+    """
+    if not claude_service:
+        raise HTTPException(
+            status_code=503,
+            detail="Claude API service is not available. Check ANTHROPIC_API_KEY environment variable."
+        )
+    
+    try:
+        response = claude_service.simple_message("Reply with just 'ack' to confirm you received this message.")
+        
+        return JSONResponse({
+            "success": True,
+            "message": "Claude API test successful",
+            "response": response
+        })
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Claude API test failed: {str(e)}"
+        )
+
+
+@app.post("/api/claude/message")
+async def send_message(user_message: dict):
+    """
+    Send a message to Claude and get a response.
+    
+    Request body:
+        {
+            "message": "Your message here",
+            "use_conversation": false  # Set to true for multi-turn conversation
+        }
+    
+    Returns:
+        Claude's response
+    """
+    if not claude_service:
+        raise HTTPException(
+            status_code=503,
+            detail="Claude API service is not available. Check ANTHROPIC_API_KEY environment variable."
+        )
+    
+    try:
+        message = user_message.get("message", "").strip()
+        use_conversation = user_message.get("use_conversation", False)
+        
+        if not message:
+            raise HTTPException(status_code=400, detail="Message cannot be empty")
+        
+        if use_conversation:
+            response = claude_service.chat_message(message)
+        else:
+            response = claude_service.simple_message(message)
+        
+        return JSONResponse({
+            "success": True,
+            "response": response,
+            "conversation_mode": use_conversation
+        })
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
+
+
+@app.post("/api/claude/reset")
+async def reset_conversation():
+    """Reset conversation history"""
+    if not claude_service:
+        raise HTTPException(status_code=503, detail="Claude API service is not available")
+    
+    try:
+        claude_service.reset_conversation()
+        return JSONResponse({
+            "success": True,
+            "message": "Conversation history cleared"
+        })
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
+
+
+# Original document extraction endpoints remain below
 @app.post("/extract")
 async def extract_document(
     file: UploadFile = File(...),
