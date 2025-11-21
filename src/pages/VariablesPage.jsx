@@ -4,10 +4,9 @@ import './VariablesPage.css';
 
 const VariablesPage = ({ uploadedFile, setProcessedFile }) => {
   const navigate = useNavigate();
-  const [extracting, setExtracting] = useState(false);
-  const [extractedContent, setExtractedContent] = useState(null);
+  const [processing, setProcessing] = useState(false);
+  const [questions, setQuestions] = useState(null);
   const [error, setError] = useState(null);
-  const [outputFormat, setOutputFormat] = useState('markdown');
 
   // Redirect if no file uploaded
   useEffect(() => {
@@ -16,46 +15,94 @@ const VariablesPage = ({ uploadedFile, setProcessedFile }) => {
     }
   }, [uploadedFile, navigate]);
 
-  const handleExtract = async () => {
-    if (!uploadedFile) return;
+  // Auto-extract on component mount
+  useEffect(() => {
+    if (uploadedFile && !questions && !error && !processing) {
+      extractQuestionsFromDocument();
+    }
+  }, [uploadedFile, questions, error, processing]);
 
-    setExtracting(true);
+  const extractQuestionsFromDocument = async () => {
+    setProcessing(true);
     setError(null);
 
     try {
-      // Create FormData
+      // Step 1: Extract content with Docling
       const formData = new FormData();
       formData.append('file', uploadedFile);
 
-      // Send to backend
-      const response = await fetch(`http://localhost:8000/extract?output_format=${outputFormat}`, {
+      const extractResponse = await fetch(
+        'http://localhost:8000/extract?output_format=text',
+        {
+          method: 'POST',
+          body: formData,
+        }
+      );
+
+      if (!extractResponse.ok) {
+        throw new Error(`Docling extraction failed with status: ${extractResponse.status}`);
+      }
+
+      const extractResult = await extractResponse.json();
+
+      if (!extractResult.success) {
+        throw new Error(extractResult.message || 'Document extraction failed');
+      }
+
+      // Step 2: Pass extracted content to Claude for question extraction
+      const documentContent = extractResult.data.content;
+
+      const claudeResponse = await fetch('http://localhost:8000/api/extract-questions', {
         method: 'POST',
-        body: formData,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          document_content: documentContent,
+        }),
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      if (!claudeResponse.ok) {
+        throw new Error(`Claude extraction failed with status: ${claudeResponse.status}`);
       }
 
-      const result = await response.json();
+      const claudeResult = await claudeResponse.json();
 
-      if (result.success) {
-        setExtractedContent(result.data);
-      } else {
-        throw new Error(result.message || 'Extraction failed');
+      console.log('Claude result:', claudeResult);
+
+      if (!claudeResult.success) {
+        throw new Error(claudeResult.message || 'Question extraction failed');
       }
+
+      console.log('Setting questions:', claudeResult.questions);
+      setQuestions(claudeResult.questions);
     } catch (err) {
       setError(err.message);
-      console.error('Extraction error:', err);
+      console.error('Processing error:', err);
     } finally {
-      setExtracting(false);
+      setProcessing(false);
     }
   };
 
-  const handleDownload = () => {
-    if (extractedContent && extractedContent.download_url) {
-      window.open(`http://localhost:8000${extractedContent.download_url}`, '_blank');
+  const getTotalQuestionCount = () => {
+    if (!questions || !Array.isArray(questions)) return 0;
+    return questions.reduce((total, group) => {
+      if (group && Array.isArray(group.questions)) {
+        return total + group.questions.length;
+      }
+      return total;
+    }, 0);
+  };
+
+  const getQuestionNumber = (groupIndex, questionIndex) => {
+    if (!questions || !Array.isArray(questions)) return questionIndex + 1;
+    let count = 0;
+    for (let i = 0; i < groupIndex; i++) {
+      if (questions[i] && Array.isArray(questions[i].questions)) {
+        count += questions[i].questions.length;
+      }
     }
+    return count + questionIndex + 1;
   };
 
   return (
@@ -63,9 +110,9 @@ const VariablesPage = ({ uploadedFile, setProcessedFile }) => {
       <div className="variables-page-container">
         <div className="variables-card">
           <div className="variables-card-header">
-            <h1 className="variables-card-title">Document Extraction</h1>
+            <h1 className="variables-card-title">Extracted Questions</h1>
             <p className="variables-card-subtitle">
-              Extract content from your uploaded document
+              Questions identified from your document
             </p>
           </div>
 
@@ -75,40 +122,13 @@ const VariablesPage = ({ uploadedFile, setProcessedFile }) => {
                 <h3>Uploaded File</h3>
                 <p><strong>Name:</strong> {uploadedFile.name}</p>
                 <p><strong>Size:</strong> {(uploadedFile.size / 1024).toFixed(2)} KB</p>
-                <p><strong>Type:</strong> {uploadedFile.type}</p>
               </div>
             )}
 
-            {!extractedContent && (
-              <div className="extraction-controls">
-                <div className="format-selector">
-                  <label htmlFor="format">Output Format:</label>
-                  <select
-                    id="format"
-                    value={outputFormat}
-                    onChange={(e) => setOutputFormat(e.target.value)}
-                    disabled={extracting}
-                  >
-                    <option value="markdown">Markdown (.md)</option>
-                    <option value="text">Plain Text (.txt)</option>
-                    <option value="json">JSON (.json)</option>
-                  </select>
-                </div>
-
-                <button
-                  onClick={handleExtract}
-                  disabled={extracting || !uploadedFile}
-                  className="extract-button"
-                >
-                  {extracting ? 'Extracting...' : 'Extract Content'}
-                </button>
-              </div>
-            )}
-
-            {extracting && (
+            {processing && (
               <div className="loading-section">
                 <div className="spinner"></div>
-                <p>Processing document with Docling...</p>
+                <p>Extracting document and identifying questions...</p>
               </div>
             )}
 
@@ -116,36 +136,44 @@ const VariablesPage = ({ uploadedFile, setProcessedFile }) => {
               <div className="error-section">
                 <h3>Error</h3>
                 <p>{error}</p>
-                <button onClick={() => setError(null)}>Try Again</button>
+                <button onClick={() => navigate('/')}>Go Back and Try Another File</button>
               </div>
             )}
 
-            {extractedContent && (
-              <div className="success-section">
-                <h3>Extraction Complete!</h3>
+            {!processing && !error && questions && questions.length > 0 && (
+              <div className="questions-section">
+                <h3>Questions ({getTotalQuestionCount()} found)</h3>
                 
-                <div className="metadata">
-                  <p><strong>Pages:</strong> {extractedContent.metadata.num_pages}</p>
-                  <p><strong>Format:</strong> {extractedContent.metadata.format}</p>
-                  <p><strong>Output File:</strong> {extractedContent.output_filename}</p>
-                </div>
+                {questions.map((group, groupIndex) => (
+                  <div key={groupIndex} className="question-group">
+                    {group.precursor && group.precursor !== null && (
+                      <div className="precursor-content">
+                        <p className="precursor-label">Context/Precursor:</p>
+                        <p className="precursor-text">{group.precursor}</p>
+                      </div>
+                    )}
+                    
+                    <div className="questions-in-group">
+                      {group.questions && Array.isArray(group.questions) && group.questions.map((question, questionIndex) => (
+                        <div key={`${groupIndex}-${questionIndex}`} className="question-item">
+                          <div className="question-number">
+                            Question {getQuestionNumber(groupIndex, questionIndex)}
+                          </div>
+                          <div className="question-content">
+                            <p className="question-text">{question}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
 
-                <div className="content-preview">
-                  <h4>Content Preview:</h4>
-                  <pre>{typeof extractedContent.content === 'string' 
-                    ? extractedContent.content.substring(0, 500) + '...'
-                    : JSON.stringify(extractedContent.content, null, 2).substring(0, 500) + '...'
-                  }</pre>
-                </div>
-
-                <div className="action-buttons">
-                  <button onClick={handleDownload} className="download-button">
-                    Download Extracted File
-                  </button>
-                  <button onClick={() => setExtractedContent(null)} className="reset-button">
-                    Extract Another Document
-                  </button>
-                </div>
+            {!processing && !error && questions && questions.length === 0 && (
+              <div className="no-questions-section">
+                <p>No questions were identified in this document.</p>
+                <button onClick={() => navigate('/')}>Upload Another File</button>
               </div>
             )}
           </div>

@@ -5,7 +5,6 @@ import os
 from pathlib import Path
 from docling.document_converter import DocumentConverter
 
-
 class DoclingService:
     def __init__(self):
         """Initialize Docling with default settings"""

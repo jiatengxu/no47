@@ -5,6 +5,7 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
+import json
 import shutil
 from pathlib import Path
 from datetime import datetime
@@ -48,7 +49,7 @@ UPLOAD_DIR.mkdir(exist_ok=True)
 OUTPUT_DIR.mkdir(exist_ok=True)
 
 # Allowed file extensions
-ALLOWED_EXTENSIONS = {'.pdf', '.docx', '.doc', '.odt', '.rtf'}
+ALLOWED_EXTENSIONS = {'.pdf', '.docx', '.doc'}
 
 
 def is_allowed_file(filename: str) -> bool:
@@ -153,6 +154,44 @@ async def reset_conversation():
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
 
+@app.post("/api/extract-questions")
+async def extract_questions(request_data: dict):
+    """
+    Extract questions and precursor content from document using Claude.
+    
+    Request body:
+        {
+            "document_content": "The full extracted document text from Docling"
+        }
+    
+    Returns:
+        List of questions with their precursor content
+    """
+    if not claude_service:
+        raise HTTPException(
+            status_code=503,
+            detail="Claude API service is not available. Check ANTHROPIC_API_KEY environment variable."
+        )
+    
+    try:
+        document_content = request_data.get("document_content", "").strip()
+        
+        if not document_content:
+            raise HTTPException(status_code=400, detail="Document content cannot be empty")
+        
+        questions = claude_service.extract_questions(document_content)
+        
+        return JSONResponse({
+            "success": True,
+            "questions": questions
+        })
+    except json.JSONDecodeError as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to parse Claude response: {str(e)}"
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
 
 # Original document extraction endpoints remain below
 @app.post("/extract")
