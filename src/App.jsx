@@ -2,11 +2,13 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { useState } from 'react';
 import UploadPage from './pages/UploadPage';
 import VariablesPage from './pages/VariablesPage';
+import ModificationsPage from './pages/ModificationsPage';
 import ResultPage from './pages/ResultPage';
 import './App.css';
 
 function App() {
   const [uploadedFile, setUploadedFile] = useState(null);
+  const [extractedQuestions, setExtractedQuestions] = useState(null);
   const [processedFile, setProcessedFile] = useState(null);
 
   return (
@@ -27,6 +29,16 @@ function App() {
             element={
               <VariablesPage 
                 uploadedFile={uploadedFile}
+                setExtractedQuestions={setExtractedQuestions}
+              />
+            } 
+          />
+          <Route 
+            path="/modifications" 
+            element={
+              <ModificationsPage 
+                uploadedFile={uploadedFile}
+                questions={extractedQuestions}
                 setProcessedFile={setProcessedFile}
               />
             } 

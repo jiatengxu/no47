@@ -36,24 +36,95 @@
 }
 
 .result-card-body {
-  padding: 2.5rem;
-  min-height: 200px;
+  padding: 3rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+
+.success-message {
+  text-align: center;
+}
+
+.success-message svg {
+  color: #10b981;
+  margin-bottom: 1.5rem;
+}
+
+.success-message h2 {
+  font-size: 2rem;
+  color: #1f2937;
+  margin-bottom: 1rem;
+}
+
+.success-message p {
+  color: #6b7280;
+  font-size: 1.125rem;
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+.success-message p.small-text {
+  font-size: 0.875rem;
+  color: #9ca3af;
+}
+
+.download-button,
+.back-button {
+  display: inline-block;
+  margin: 1rem 0.5rem;
+  padding: 0.75rem 2rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.download-button {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.download-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+}
+
+.back-button {
+  background: #e5e7eb;
+  color: #1f2937;
+}
+
+.back-button:hover {
+  background: #d1d5db;
 }
 
 @media (max-width: 768px) {
   .result-card-header {
     padding: 2rem 1rem;
   }
-  
+
   .result-card-title {
     font-size: 2rem;
   }
-  
+
   .result-card-subtitle {
     font-size: 1rem;
   }
-  
+
   .result-card-body {
     padding: 1.5rem;
+    min-height: auto;
+  }
+
+  .download-button,
+  .back-button {
+    display: block;
+    width: 100%;
+    margin: 0.75rem 0;
   }
 }
