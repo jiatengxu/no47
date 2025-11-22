@@ -76,13 +76,13 @@ const VariablesPage = ({ uploadedFile, setExtractedQuestions }) => {
 
       console.log('Setting questions:', claudeResult.questions);
       setQuestions(claudeResult.questions);
+      setExtractedQuestions(claudeResult.questions); // ADD THIS LINE
     } catch (err) {
       setError(err.message);
       console.error('Processing error:', err);
     } finally {
       setProcessing(false);
     }
-    return count + questionIndex + 1;
   };
 
   const getTotalQuestionCount = () => {
@@ -104,6 +104,12 @@ const VariablesPage = ({ uploadedFile, setExtractedQuestions }) => {
       }
     }
     return count + questionIndex + 1;
+  };
+
+  const handleContinue = () => {
+    if (questions && questions.length > 0) {
+      navigate('/modifications');
+    }
   };
 
   return (
@@ -168,13 +174,15 @@ const VariablesPage = ({ uploadedFile, setExtractedQuestions }) => {
                     </div>
                   </div>
                 ))}
-              </div>
-            )}
 
-            {!processing && !error && questions && questions.length === 0 && (
-              <div className="no-questions-section">
-                <p>No questions were identified in this document.</p>
-                <button onClick={() => navigate('/')}>Upload Another File</button>
+                <div className="action-buttons">
+                  <button
+                    className="continue-button"
+                    onClick={handleContinue}
+                  >
+                    Continue to Modifications →
+                  </button>
+                </div>
               </div>
             )}
 
