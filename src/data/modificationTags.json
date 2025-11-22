@@ -1,417 +1,84 @@
 {
   "categories": {
-    "reading-level": {
-      "name": "Reading Level / Complexity",
-      "color": "#3B82F6",
-      "description": "Adjust text complexity and vocabulary"
+    "simplification": {
+      "name": "Simplification",
+      "color": "#3B82F6"
     },
-    "tone": {
-      "name": "Tone & Style",
-      "color": "#8B5CF6",
-      "description": "Change how the question is presented"
-    },
-    "structure": {
-      "name": "Sentence Structure & Clarity",
-      "color": "#EC4899",
-      "description": "Simplify sentence structure and clarity"
+    "clarity": {
+      "name": "Clarity & Structure",
+      "color": "#8B5CF6"
     },
     "scaffolding": {
-      "name": "Cognitive Load & Scaffolding",
-      "color": "#F59E0B",
-      "description": "Break down tasks and provide support"
+      "name": "Scaffolding & Support",
+      "color": "#F59E0B"
     },
     "format": {
-      "name": "Response Format Modification",
-      "color": "#10B981",
-      "description": "Change how student responds"
-    },
-    "content": {
-      "name": "Content Reduction",
-      "color": "#06B6D4",
-      "description": "Reduce scope and complexity"
-    },
-    "vocabulary": {
-      "name": "Vocabulary Support",
-      "color": "#EF4444",
-      "description": "Define and simplify terms"
-    },
-    "visual": {
-      "name": "Visual / Graphic Support",
-      "color": "#6366F1",
-      "description": "Add visual aids and organizers"
-    },
-    "skill": {
-      "name": "Alternate Skill Level",
-      "color": "#14B8A6",
-      "description": "Adjust difficulty level"
+      "name": "Response Format",
+      "color": "#10B981"
     },
     "precision": {
-      "name": "Language Consistency & Precision",
-      "color": "#F97316",
-      "description": "Make language clearer and more precise"
+      "name": "Precision & Language",
+      "color": "#F97316"
     }
   },
   "tags": {
     "simplify-language": {
       "id": "simplify-language",
       "name": "Simplify Language",
-      "category": "reading-level",
-      "description": "Makes vocabulary and sentence structure simpler and more accessible",
+      "category": "simplification",
+      "description": "Make vocabulary and sentence structure more accessible",
+      "purpose": "Reduces reading difficulty by using simpler words and shorter sentences while maintaining educational value",
       "example": {
         "original": "Explain how photosynthesis enables plants to produce their own food.",
         "modified": "Explain how plants make their own food."
       },
-      "conflicts": ["adult-plain-language"]
-    },
-    "reduce-jargon": {
-      "id": "reduce-jargon",
-      "name": "Reduce Jargon",
-      "category": "reading-level",
-      "description": "Replaces technical terms with simpler, everyday language",
-      "example": {
-        "original": "Explain how photosynthesis enables plants to produce their own food.",
-        "modified": "Explain how plants use sunlight to make food."
-      },
       "conflicts": []
     },
-    "adult-plain-language": {
-      "id": "adult-plain-language",
-      "name": "Adult Plain Language",
-      "category": "reading-level",
-      "description": "Uses direct, straightforward language suitable for adult learners",
-      "example": {
-        "original": "Explain how photosynthesis enables plants to produce their own food.",
-        "modified": "Explain how photosynthesis helps a plant create the energy it needs to live."
-      },
-      "conflicts": ["simplify-language"]
-    },
-    "professional-tone": {
-      "id": "professional-tone",
-      "name": "Professional Tone",
-      "category": "tone",
-      "description": "Uses formal, professional language and phrasing",
-      "example": {
-        "original": "Explain why the main character made an unwise decision.",
-        "modified": "Explain the reasoning behind the main character's decision and why it may not have been appropriate."
-      },
-      "conflicts": ["student-friendly-tone"]
-    },
-    "student-friendly-tone": {
-      "id": "student-friendly-tone",
-      "name": "Student-Friendly Tone",
-      "category": "tone",
-      "description": "Uses casual, relatable language that feels conversational",
-      "example": {
-        "original": "Explain why the main character made an unwise decision.",
-        "modified": "Why do you think the main character made a choice that didn't work out well?"
-      },
-      "conflicts": ["professional-tone"]
-    },
-    "strength-based-tone": {
-      "id": "strength-based-tone",
-      "name": "Strength-Based Tone",
-      "category": "tone",
-      "description": "Focuses on what the character was trying to do rather than failure",
-      "example": {
-        "original": "Explain why the main character made an unwise decision.",
-        "modified": "Explain what the main character was trying to do and why the choice ended up being less effective."
-      },
-      "conflicts": []
-    },
-    "neutral-tone": {
-      "id": "neutral-tone",
-      "name": "Neutral Tone",
-      "category": "tone",
-      "description": "Uses objective, unbiased language without judgmental words",
-      "example": {
-        "original": "Explain why the main character made an unwise decision.",
-        "modified": "Explain why the main character's decision did not work out."
-      },
-      "conflicts": []
-    },
-    "active-voice": {
-      "id": "active-voice",
-      "name": "Active Voice",
-      "category": "structure",
-      "description": "Changes passive voice to active voice for clarity",
-      "example": {
-        "original": "In what ways can temperature changes be observed in different states of matter?",
-        "modified": "How can you observe temperature changes in different states of matter?"
-      },
-      "conflicts": []
-    },
-    "concise": {
-      "id": "concise",
-      "name": "Concise",
-      "category": "structure",
-      "description": "Removes unnecessary words and phrases",
-      "example": {
-        "original": "How can you observe temperature changes in different states of matter?",
-        "modified": "How can you observe temperature changes in states of matter?"
-      },
-      "conflicts": ["chunk-steps"]
-    },
-    "remove-redundancy": {
-      "id": "remove-redundancy",
-      "name": "Remove Redundancy",
-      "category": "structure",
-      "description": "Eliminates repeated or redundant information",
-      "example": {
-        "original": "How can you observe temperature changes in different states of matter?",
-        "modified": "How can you observe temperature changes in matter?"
-      },
-      "conflicts": []
-    },
-    "consistent-terminology": {
-      "id": "consistent-terminology",
-      "name": "Consistent Terminology",
-      "category": "structure",
-      "description": "Uses consistent, specific terms throughout the question",
-      "example": {
-        "original": "In what ways can temperature changes be observed in different states of matter?",
-        "modified": "How can you observe temperature changes in the solid, liquid, and gas states of matter?"
-      },
-      "conflicts": []
-    },
-    "clarify-responsibility": {
-      "id": "clarify-responsibility",
-      "name": "Clarify Responsibility",
-      "category": "structure",
-      "description": "Makes it clear what the student should do",
-      "example": {
-        "original": "In what ways can temperature changes be observed in different states of matter?",
-        "modified": "Describe how you would observe temperature changes in solids, liquids, and gases."
-      },
-      "conflicts": []
-    },
-    "chunk-steps": {
-      "id": "chunk-steps",
-      "name": "Chunk Steps",
+    "break-down-steps": {
+      "id": "break-down-steps",
+      "name": "Break Down into Steps",
       "category": "scaffolding",
-      "description": "Breaks a complex task into smaller, numbered steps",
+      "description": "Divide complex tasks into smaller, numbered sub-tasks",
+      "purpose": "Reduces cognitive load by breaking multi-part questions into manageable pieces while preserving all required content",
       "example": {
         "original": "Describe how water evaporates and then forms precipitation as part of the water cycle.",
         "modified": "1. Explain what evaporation means.\n2. Explain what precipitation means.\n3. Describe how evaporation and precipitation are connected."
       },
-      "conflicts": ["one-step-only", "concise"]
+      "conflicts": []
     },
-    "one-step-only": {
-      "id": "one-step-only",
-      "name": "One Step Only",
+    "provide-example": {
+      "id": "provide-example",
+      "name": "Provide Example or Model",
       "category": "scaffolding",
-      "description": "Reduces the question to focus on just one simple task",
+      "description": "Add a concrete example or model answer to guide understanding",
+      "purpose": "Gives students a reference point by showing what a good response looks like, promoting clarity and confidence",
       "example": {
-        "original": "Describe how water evaporates and then forms precipitation as part of the water cycle.",
-        "modified": "Explain what evaporation means."
-      },
-      "conflicts": ["chunk-steps"]
-    },
-    "provide-hint": {
-      "id": "provide-hint",
-      "name": "Provide Hint",
-      "category": "scaffolding",
-      "description": "Adds a helpful hint to guide the student toward the answer",
-      "example": {
-        "original": "Describe how water evaporates and then forms precipitation as part of the water cycle.",
-        "modified": "Describe how water evaporates. Hint: Think about what happens when the sun warms water."
+        "original": "Describe how water forms precipitation.",
+        "modified": "Describe how water forms precipitation. Example: When water vapor cools in the atmosphere, it condenses and falls as rain or snow."
       },
       "conflicts": []
     },
-    "provide-model": {
-      "id": "provide-model",
-      "name": "Provide Model",
-      "category": "scaffolding",
-      "description": "Provides an example answer to help students understand what's expected",
+    "clarify-action": {
+      "id": "clarify-action",
+      "name": "Clarify What to Do",
+      "category": "clarity",
+      "description": "Make it explicitly clear what action or response is expected",
+      "purpose": "Removes ambiguity by using specific verbs (identify, explain, describe, list) so students understand exactly what is being asked",
       "example": {
-        "original": "Describe how water evaporates and forms precipitation.",
-        "modified": "Describe how water evaporates and forms precipitation. Model: For example, when heat warms water, it can turn into a gas."
-      },
-      "conflicts": []
-    },
-    "multiple-choice-version": {
-      "id": "multiple-choice-version",
-      "name": "Multiple Choice",
-      "category": "format",
-      "description": "Converts the question to multiple choice format",
-      "example": {
-        "original": "Explain the role of the mitochondria.",
-        "modified": "What is the main role of the mitochondria?\nA. Store water\nB. Produce energy\nC. Control movement\nD. Protect the cell"
-      },
-      "conflicts": ["sentence-starters", "fill-in-the-blank-version", "word-bank"]
-    },
-    "word-bank": {
-      "id": "word-bank",
-      "name": "Word Bank",
-      "category": "format",
-      "description": "Provides a list of words the student can choose from",
-      "example": {
-        "original": "Explain the role of the mitochondria.",
-        "modified": "The mitochondria help a cell by providing ______.\nWord bank: energy, support, water, waste removal"
-      },
-      "conflicts": ["multiple-choice-version", "fill-in-the-blank-version"]
-    },
-    "sentence-starters": {
-      "id": "sentence-starters",
-      "name": "Sentence Starters",
-      "category": "format",
-      "description": "Provides the beginning of a sentence to help students get started",
-      "example": {
-        "original": "Explain the role of the mitochondria.",
-        "modified": "The mitochondria are important because ______."
-      },
-      "conflicts": ["multiple-choice-version"]
-    },
-    "fill-in-the-blank-version": {
-      "id": "fill-in-the-blank-version",
-      "name": "Fill-in-the-Blank",
-      "category": "format",
-      "description": "Converts the question to a fill-in-the-blank format",
-      "example": {
-        "original": "Explain the role of the mitochondria.",
-        "modified": "The mitochondria produce ______ for the cell."
-      },
-      "conflicts": ["multiple-choice-version", "word-bank"]
-    },
-    "focus-on-key-idea": {
-      "id": "focus-on-key-idea",
-      "name": "Focus on Key Idea",
-      "category": "content",
-      "description": "Narrows focus to one main concept instead of multiple",
-      "example": {
-        "original": "Compare and contrast mitosis and meiosis in terms of purpose, process, and outcomes.",
-        "modified": "Explain one difference between mitosis and meiosis."
-      },
-      "conflicts": []
-    },
-    "reduce-length": {
-      "id": "reduce-length",
-      "name": "Reduce Length",
-      "category": "content",
-      "description": "Asks for less information overall",
-      "example": {
-        "original": "Compare and contrast mitosis and meiosis in terms of purpose, process, and outcomes.",
-        "modified": "List one similarity and one difference between mitosis and meiosis."
-      },
-      "conflicts": ["focus-on-key-idea"]
-    },
-    "remove-abstract-parts": {
-      "id": "remove-abstract-parts",
-      "name": "Remove Abstract Parts",
-      "category": "content",
-      "description": "Focuses on concrete, observable elements instead of abstract concepts",
-      "example": {
-        "original": "Compare and contrast mitosis and meiosis in terms of purpose, process, and outcomes.",
-        "modified": "Tell what happens to the number of chromosomes in mitosis."
-      },
-      "conflicts": ["adult-plain-language"]
-    },
-    "define-key-terms": {
-      "id": "define-key-terms",
-      "name": "Define Key Terms",
-      "category": "vocabulary",
-      "description": "Provides definitions for difficult vocabulary within the question",
-      "example": {
-        "original": "Analyze the impact of industrialization on urban migration patterns.",
-        "modified": "How did industrialization (growth of factories) affect people moving to cities?"
-      },
-      "conflicts": []
-    },
-    "glossary-inline": {
-      "id": "glossary-inline",
-      "name": "Glossary Inline",
-      "category": "vocabulary",
-      "description": "Provides quick parenthetical definitions for complex terms",
-      "example": {
-        "original": "Analyze the impact of industrialization on urban migration patterns.",
-        "modified": "Analyze the impact of industrialization (growth of factories) on urban migration (movement to cities)."
-      },
-      "conflicts": ["reduce-jargon"]
-    },
-    "replace-tier-3-words": {
-      "id": "replace-tier-3-words",
-      "name": "Replace Tier-3 Words",
-      "category": "vocabulary",
-      "description": "Replaces academic vocabulary with simpler alternatives",
-      "example": {
-        "original": "Analyze the impact of industrialization on urban migration patterns.",
-        "modified": "Explain how growing factories changed the number of people moving to cities."
-      },
-      "conflicts": []
-    },
-    "add-graphic-organizer": {
-      "id": "add-graphic-organizer",
-      "name": "Add Graphic Organizer",
-      "category": "visual",
-      "description": "Includes a visual table or chart to organize information",
-      "example": {
-        "original": "Describe the cause and effect in the American Revolution.",
-        "modified": "Describe the cause and effect in the American Revolution. [Includes Cause → Effect table]"
-      },
-      "conflicts": []
-    },
-    "add-visual-cues": {
-      "id": "add-visual-cues",
-      "name": "Add Visual Cues",
-      "category": "visual",
-      "description": "Highlights key words or concepts with formatting",
-      "example": {
-        "original": "Describe the cause and effect in the American Revolution.",
-        "modified": "Describe the **cause** and **effect** in the American Revolution."
-      },
-      "conflicts": []
-    },
-    "step-by-step-graphics": {
-      "id": "step-by-step-graphics",
-      "name": "Step-by-Step Graphics",
-      "category": "visual",
-      "description": "Includes numbered or visual step sequences",
-      "example": {
-        "original": "Describe the process of photosynthesis.",
-        "modified": "Describe the process of photosynthesis. [Includes numbered step boxes: Step 1 → Step 2 → Step 3]"
-      },
-      "conflicts": []
-    },
-    "lower-grade-level-version": {
-      "id": "lower-grade-level-version",
-      "name": "Lower Grade Level",
-      "category": "skill",
-      "description": "Rewrites for a younger grade level",
-      "example": {
-        "original": "Explain the function of the circulatory system.",
-        "modified": "Tell what the heart and blood do for your body."
-      },
-      "conflicts": ["professional-tone"]
-    },
-    "concrete-version": {
-      "id": "concrete-version",
-      "name": "Concrete Version",
-      "category": "skill",
-      "description": "Uses concrete examples instead of abstract concepts",
-      "example": {
-        "original": "Explain the function of the circulatory system.",
-        "modified": "Explain how your heart moves blood through your body."
+        "original": "In what ways can temperature changes be observed in different states of matter?",
+        "modified": "Describe two ways you can observe temperature changes in solids, liquids, and gases."
       },
       "conflicts": []
     },
     "remove-ambiguity": {
       "id": "remove-ambiguity",
-      "name": "Remove Ambiguity",
+      "name": "Remove Vague Language",
       "category": "precision",
-      "description": "Makes vague language more specific and clear",
+      "description": "Replace unclear or imprecise wording with specific, concrete language",
+      "purpose": "Ensures questions are unambiguous by replacing vague terms with specific examples and concrete details",
       "example": {
         "original": "Discuss how animals respond to environmental changes.",
-        "modified": "Describe how animals respond to changes in their environment."
-      },
-      "conflicts": []
-    },
-    "clear-task-word": {
-      "id": "clear-task-word",
-      "name": "Clear Task Word",
-      "category": "precision",
-      "description": "Uses specific action verbs (identify, describe, explain) instead of vague ones",
-      "example": {
-        "original": "Discuss how animals respond to environmental changes.",
-        "modified": "Identify two ways animals respond to changes in their environment."
+        "modified": "Identify two ways animals respond to changes in temperature or light."
       },
       "conflicts": []
     }
