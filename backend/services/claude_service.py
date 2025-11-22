@@ -31,6 +31,7 @@ class ClaudeService:
     def simple_message(self, prompt: str) -> str:
         """
         Send a simple message to Claude and get a response.
+        Does not maintain conversation history.
         
         Args:
             prompt: The user's message/prompt

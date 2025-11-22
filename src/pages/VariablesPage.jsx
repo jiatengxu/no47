@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './VariablesPage.css';
 
-const VariablesPage = ({ uploadedFile, setProcessedFile }) => {
+const VariablesPage = ({ uploadedFile, setExtractedQuestions }) => {
   const navigate = useNavigate();
   const [processing, setProcessing] = useState(false);
   const [questions, setQuestions] = useState(null);
@@ -82,6 +82,7 @@ const VariablesPage = ({ uploadedFile, setProcessedFile }) => {
     } finally {
       setProcessing(false);
     }
+    return count + questionIndex + 1;
   };
 
   const getTotalQuestionCount = () => {
@@ -167,6 +168,13 @@ const VariablesPage = ({ uploadedFile, setProcessedFile }) => {
                     </div>
                   </div>
                 ))}
+              </div>
+            )}
+
+            {!processing && !error && questions && questions.length === 0 && (
+              <div className="no-questions-section">
+                <p>No questions were identified in this document.</p>
+                <button onClick={() => navigate('/')}>Upload Another File</button>
               </div>
             )}
 
