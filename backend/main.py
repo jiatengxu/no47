@@ -68,92 +68,6 @@ async def root():
     }
 
 
-@app.post("/api/claude/test")
-async def test_claude():
-    """
-    Simple test endpoint to verify Claude API integration.
-    Sends a test prompt and returns response to confirm connectivity.
-    
-    Returns:
-        Test response from Claude API
-    """
-    if not claude_service:
-        raise HTTPException(
-            status_code=503,
-            detail="Claude API service is not available. Check ANTHROPIC_API_KEY environment variable."
-        )
-    
-    try:
-        response = claude_service.simple_message("Reply with just 'ack' to confirm you received this message.")
-        
-        return JSONResponse({
-            "success": True,
-            "message": "Claude API test successful",
-            "response": response
-        })
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Claude API test failed: {str(e)}"
-        )
-
-
-@app.post("/api/claude/message")
-async def send_message(user_message: dict):
-    """
-    Send a message to Claude and get a response.
-    
-    Request body:
-        {
-            "message": "Your message here",
-            "use_conversation": false  # Set to true for multi-turn conversation
-        }
-    
-    Returns:
-        Claude's response
-    """
-    if not claude_service:
-        raise HTTPException(
-            status_code=503,
-            detail="Claude API service is not available. Check ANTHROPIC_API_KEY environment variable."
-        )
-    
-    try:
-        message = user_message.get("message", "").strip()
-        use_conversation = user_message.get("use_conversation", False)
-        
-        if not message:
-            raise HTTPException(status_code=400, detail="Message cannot be empty")
-        
-        if use_conversation:
-            response = claude_service.chat_message(message)
-        else:
-            response = claude_service.simple_message(message)
-        
-        return JSONResponse({
-            "success": True,
-            "response": response,
-            "conversation_mode": use_conversation
-        })
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
-
-
-@app.post("/api/claude/reset")
-async def reset_conversation():
-    """Reset conversation history"""
-    if not claude_service:
-        raise HTTPException(status_code=503, detail="Claude API service is not available")
-    
-    try:
-        claude_service.reset_conversation()
-        return JSONResponse({
-            "success": True,
-            "message": "Conversation history cleared"
-        })
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
-
 @app.post("/api/extract-questions")
 async def extract_questions(request_data: dict):
     """
@@ -193,7 +107,59 @@ async def extract_questions(request_data: dict):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
 
-# Original document extraction endpoints remain below
+
+@app.post("/api/claude/modify")
+async def modify_content(request_data: dict):
+    """
+    Modify question or precursor text according to selected tags.
+    
+    Request body:
+        {
+            "original_text": "The original question or precursor text",
+            "selected_tags": ["tag-id-1", "tag-id-2"],
+            "is_precursor": false
+        }
+    
+    Returns:
+        Modified text
+    """
+    if not claude_service:
+        raise HTTPException(
+            status_code=503,
+            detail="Claude API service is not available. Check ANTHROPIC_API_KEY environment variable."
+        )
+    
+    try:
+        original_text = request_data.get("original_text", "").strip()
+        selected_tags = request_data.get("selected_tags", [])
+        is_precursor = request_data.get("is_precursor", False)
+        
+        if not original_text:
+            raise HTTPException(status_code=400, detail="Original text cannot be empty")
+        
+        if not selected_tags:
+            raise HTTPException(status_code=400, detail="At least one tag must be selected")
+        
+        # Load tag metadata
+        import json
+        with open(Path(__file__).resolve().parent / "../src/data/modificationTags.json") as f:
+            tag_data = json.load(f)
+        
+        modified_text = claude_service.modify_content(
+            original_text=original_text,
+            selected_tags=selected_tags,
+            tag_metadata=tag_data.get("tags", {}),
+            is_precursor=is_precursor
+        )
+        
+        return JSONResponse({
+            "success": True,
+            "response": modified_text
+        })
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
+
+
 @app.post("/extract")
 async def extract_document(
     file: UploadFile = File(...),

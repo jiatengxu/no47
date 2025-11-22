@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import modificationTags from '../data/modificationTags.json';
-import TagChip from '../components/TagChip';
 import QuestionModifier from '../components/QuestionModifier';
 import './ModificationsPage.css';
 
 const ModificationsPage = ({ uploadedFile, questions, setProcessedFile }) => {
   const navigate = useNavigate();
   const [modifications, setModifications] = useState({});
-  const [showWarning, setShowWarning] = useState(false);
 
   // Redirect if no questions
   useEffect(() => {
@@ -21,8 +19,20 @@ const ModificationsPage = ({ uploadedFile, questions, setProcessedFile }) => {
   useEffect(() => {
     const initialModifications = {};
     questions?.forEach((group, groupIdx) => {
+      // Initialize precursor if it exists
+      if (group.precursor && group.precursor !== null) {
+        const precursorId = `precursor-${groupIdx}`;
+        initialModifications[precursorId] = {
+          selectedTags: [],
+          isLocked: false,
+          preview: null,
+        };
+      }
+
+      // Initialize questions
       group.questions?.forEach((_, qIdx) => {
-        initialModifications[`${groupIdx}-${qIdx}`] = {
+        const questionId = `question-${groupIdx}-${qIdx}`;
+        initialModifications[questionId] = {
           selectedTags: [],
           isLocked: false,
           preview: null,
@@ -32,64 +42,71 @@ const ModificationsPage = ({ uploadedFile, questions, setProcessedFile }) => {
     setModifications(initialModifications);
   }, [questions]);
 
-  const handleTagSelect = (questionId, tagId, isSelected) => {
+  const handleTagSelect = (itemId, tagId, isSelected) => {
     setModifications((prev) => {
-      const current = prev[questionId];
+      const current = prev[itemId];
       const newTags = isSelected
         ? [...current.selectedTags, tagId]
         : current.selectedTags.filter((t) => t !== tagId);
 
       return {
         ...prev,
-        [questionId]: {
+        [itemId]: {
           ...current,
           selectedTags: newTags,
-          preview: null, // Clear preview when tags change
+          preview: null,
         },
       };
     });
   };
 
-  const handleApplyTags = async (questionId, questionText) => {
-    const { selectedTags } = modifications[questionId];
+  const handleApplyTags = async (itemId, itemText, itemType) => {
+    const { selectedTags } = modifications[itemId];
 
-    // If no tags selected, don't call Claude
     if (selectedTags.length === 0) {
       setModifications((prev) => ({
         ...prev,
-        [questionId]: {
-          ...prev[questionId],
-          preview: questionText, // Use original text
+        [itemId]: {
+          ...prev[itemId],
+          preview: itemText,
         },
       }));
       return;
     }
 
-    // Build prompt with tag instructions
+    // Build tag instructions with full context
     const tagInstructions = selectedTags
       .map((tagId) => {
         const tag = modificationTags.tags[tagId];
-        return `- ${tag.name}: ${tag.description}`;
+        return `- ${tag.name}: ${tag.description}\n  Purpose: ${tag.purpose}`;
       })
       .join('\n');
 
-    const prompt = `Modify the following question according to these tags:
+    const contentType = itemType === 'precursor' ? 'precursor' : 'question';
+    const preserveNote = itemType === 'precursor' 
+      ? 'Keep all critical information intact. Preserve the core meaning and context.'
+      : 'Preserve the core meaning and educational value.';
+
+    const prompt = `Modify the following ${contentType} according to these tags:
+
 ${tagInstructions}
 
-Original Question:
-${questionText}
+Original ${contentType.charAt(0).toUpperCase() + contentType.slice(1)}:
+${itemText}
 
-Return ONLY the modified question text, nothing else.`;
+Important: ${preserveNote}
+Return ONLY the modified text, nothing else.`;
 
     try {
-      const response = await fetch('http://localhost:8000/api/claude/message', {
+      const response = await fetch('http://localhost:8000/api/claude/modify', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          message: prompt,
-          use_conversation: false,
+          original_text: itemText,
+          selected_tags: selectedTags,
+          is_precursor: itemType === 'precursor',
         }),
       });
 
@@ -102,8 +119,8 @@ Return ONLY the modified question text, nothing else.`;
 
       setModifications((prev) => ({
         ...prev,
-        [questionId]: {
-          ...prev[questionId],
+        [itemId]: {
+          ...prev[itemId],
           preview: modifiedText,
         },
       }));
@@ -113,22 +130,21 @@ Return ONLY the modified question text, nothing else.`;
     }
   };
 
-  const handleLock = (questionId) => {
+  const handleLock = (itemId) => {
     setModifications((prev) => ({
       ...prev,
-      [questionId]: {
-        ...prev[questionId],
-        isLocked: !prev[questionId].isLocked,
+      [itemId]: {
+        ...prev[itemId],
+        isLocked: !prev[itemId].isLocked,
       },
     }));
   };
 
   const handleContinueToResult = () => {
-    // Prepare final modifications
     const lockedModifications = Object.entries(modifications).reduce(
-      (acc, [questionId, mod]) => {
+      (acc, [itemId, mod]) => {
         if (mod.isLocked && mod.preview) {
-          acc[questionId] = mod.preview;
+          acc[itemId] = mod.preview;
         }
         return acc;
       },
@@ -150,7 +166,7 @@ Return ONLY the modified question text, nothing else.`;
           <div className="modifications-card-header">
             <h1 className="modifications-card-title">Modify Questions</h1>
             <p className="modifications-card-subtitle">
-              Select tags to customize questions for your students
+              Select tags to customize questions and context for your students
             </p>
           </div>
 
@@ -159,35 +175,39 @@ Return ONLY the modified question text, nothing else.`;
               questions.map((group, groupIdx) => (
                 <div key={groupIdx} className="question-group">
                   {group.precursor && group.precursor !== null && (
-                    <div className="precursor-section">
-                      <p className="precursor-label">Context/Precursor:</p>
-                      <p className="precursor-text">{group.precursor}</p>
-                    </div>
+                    <QuestionModifier
+                      questionId={`precursor-${groupIdx}`}
+                      itemNumber={groupIdx + 1}
+                      originalText={group.precursor}
+                      selectedTags={modifications[`precursor-${groupIdx}`]?.selectedTags || []}
+                      isLocked={modifications[`precursor-${groupIdx}`]?.isLocked || false}
+                      preview={modifications[`precursor-${groupIdx}`]?.preview || null}
+                      onTagSelect={handleTagSelect}
+                      onApplyTags={handleApplyTags}
+                      onLock={handleLock}
+                      itemType="precursor"
+                    />
                   )}
 
                   <div className="questions-list">
                     {group.questions?.map((question, qIdx) => {
-                      const questionId = `${groupIdx}-${qIdx}`;
+                      const questionId = `question-${groupIdx}-${qIdx}`;
                       const mod = modifications[questionId];
+                      const questionNumber = qIdx + 1;
 
                       return (
                         <QuestionModifier
                           key={questionId}
                           questionId={questionId}
-                          questionNumber={
-                            Object.keys(modifications)
-                              .slice(0, Object.keys(modifications).indexOf(questionId))
-                              .filter(
-                                (id) => modifications[id]
-                              ).length + 1
-                          }
-                          originalQuestion={question}
+                          itemNumber={questionNumber}
+                          originalText={question}
                           selectedTags={mod?.selectedTags || []}
                           isLocked={mod?.isLocked || false}
                           preview={mod?.preview || null}
                           onTagSelect={handleTagSelect}
                           onApplyTags={handleApplyTags}
                           onLock={handleLock}
+                          itemType="question"
                         />
                       );
                     })}
@@ -206,22 +226,6 @@ Return ONLY the modified question text, nothing else.`;
           </div>
         </div>
       </div>
-
-      {showWarning && (
-        <div className="warning-modal">
-          <div className="warning-content">
-            <h3>⚠️ Warning</h3>
-            <p>
-              If you navigate away or refresh this page, all your modifications
-              will be lost. Make sure you've locked in all your changes before
-              proceeding.
-            </p>
-            <div className="warning-actions">
-              <button onClick={() => setShowWarning(false)}>Got it</button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

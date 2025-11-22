@@ -5,20 +5,21 @@ import './QuestionModifier.css';
 
 const QuestionModifier = ({
   questionId,
-  questionNumber,
-  originalQuestion,
+  itemNumber,
+  originalText,
   selectedTags,
   isLocked,
   preview,
   onTagSelect,
   onApplyTags,
   onLock,
+  itemType = 'question',
 }) => {
   const [isApplying, setIsApplying] = useState(false);
 
   const handleApplyClick = async () => {
     setIsApplying(true);
-    await onApplyTags(questionId, originalQuestion);
+    await onApplyTags(questionId, originalText, itemType);
     setIsApplying(false);
   };
 
@@ -36,22 +37,25 @@ const QuestionModifier = ({
 
   const allTags = Object.values(modificationTags.tags);
 
+  const itemLabel = itemType === 'precursor' ? 'Context/Precursor' : 'Question';
+  const lockButtonTitle = isLocked ? 'Unlock to make changes' : 'Lock in changes';
+
   return (
     <div className={`question-modifier ${isLocked ? 'locked' : ''}`}>
       <div className="question-header">
-        <h4 className="question-number">Question {questionNumber}</h4>
+        <h4 className="question-number">{itemLabel} {itemNumber}</h4>
         <button
           className={`lock-button ${isLocked ? 'locked' : ''}`}
           onClick={() => onLock(questionId)}
-          title={isLocked ? 'Unlock to make changes' : 'Lock in changes'}
+          title={lockButtonTitle}
         >
           {isLocked ? '🔒' : '🔓'}
         </button>
       </div>
 
       <div className="original-question">
-        <p className="label">Original Question:</p>
-        <p className="text">{originalQuestion}</p>
+        <p className="label">Original {itemLabel}:</p>
+        <p className="text">{originalText}</p>
       </div>
 
       {!isLocked && (
@@ -86,9 +90,34 @@ const QuestionModifier = ({
       )}
 
       {preview !== null && (
-        <div className="preview-section">
-          <p className="label">Modified Question:</p>
+        <div className={`preview-section ${isLocked ? 'locked' : ''}`}>
+          <p className="label">Modified {itemLabel}:</p>
           <p className="text modified">{preview}</p>
+
+          {isLocked && selectedTags.length > 0 && (
+            <div className="locked-tags">
+              <p className="locked-tags-label">Applied Tags:</p>
+              <div className="locked-tags-list">
+                {selectedTags.map((tagId) => {
+                  const tag = modificationTags.tags[tagId];
+                  const category = modificationTags.categories[tag.category];
+                  return (
+                    <span
+                      key={tagId}
+                      className="locked-tag"
+                      style={{
+                        borderColor: category.color,
+                        color: category.color,
+                        backgroundColor: 'transparent',
+                      }}
+                    >
+                      {tag.name}
+                    </span>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {!isLocked && (
             <button
@@ -98,13 +127,6 @@ const QuestionModifier = ({
               ✓ Lock in Changes
             </button>
           )}
-        </div>
-      )}
-
-      {isLocked && preview !== null && (
-        <div className="preview-section locked-preview">
-          <p className="label">✓ Locked Modification:</p>
-          <p className="text modified">{preview}</p>
         </div>
       )}
 

@@ -68,15 +68,12 @@ const VariablesPage = ({ uploadedFile, setExtractedQuestions }) => {
 
       const claudeResult = await claudeResponse.json();
 
-      console.log('Claude result:', claudeResult);
-
       if (!claudeResult.success) {
         throw new Error(claudeResult.message || 'Question extraction failed');
       }
 
-      console.log('Setting questions:', claudeResult.questions);
       setQuestions(claudeResult.questions);
-      setExtractedQuestions(claudeResult.questions); // ADD THIS LINE
+      setExtractedQuestions(claudeResult.questions);
     } catch (err) {
       setError(err.message);
       console.error('Processing error:', err);
@@ -155,7 +152,9 @@ const VariablesPage = ({ uploadedFile, setExtractedQuestions }) => {
                   <div key={groupIndex} className="question-group">
                     {group.precursor && group.precursor !== null && (
                       <div className="precursor-content">
-                        <p className="precursor-label">Context/Precursor:</p>
+                        <div className="precursor-header">
+                          <span className="precursor-badge">CONTEXT</span>
+                        </div>
                         <p className="precursor-text">{group.precursor}</p>
                       </div>
                     )}
@@ -164,7 +163,7 @@ const VariablesPage = ({ uploadedFile, setExtractedQuestions }) => {
                       {group.questions && Array.isArray(group.questions) && group.questions.map((question, questionIndex) => (
                         <div key={`${groupIndex}-${questionIndex}`} className="question-item">
                           <div className="question-number">
-                            Question {getQuestionNumber(groupIndex, questionIndex)}
+                            Q{getQuestionNumber(groupIndex, questionIndex)}
                           </div>
                           <div className="question-content">
                             <p className="question-text">{question}</p>
